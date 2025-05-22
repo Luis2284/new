@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | JK's Wok Oriental</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-color: #f8e6e6;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .admin-sidebar {
+            width: 220px;
+            background: linear-gradient(180deg, #b71c1c 80%, #ffb74d 100%);
+            color: #fff;
+            padding: 32px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.07);
+        }
+        .admin-sidebar h2 {
+            font-family: 'Bebas Neue', Arial, sans-serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #fff700;
+            text-shadow: 1px 1px 8px #b71c1c;
+        }
+        .admin-menu {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .admin-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 12px 32px;
+            border-radius: 8px 0 0 8px;
+            transition: background 0.2s;
+        }
+        .admin-menu a.activo, .admin-menu a:hover {
+            background: #fffbe7;
+            color: #b71c1c;
+        }
+        .admin-main {
+            flex: 1;
+            padding: 48px 32px;
+            background: #fff7e6;
+        }
+        .admin-main h1 {
+            color: #b71c1c;
+            font-family: 'Bebas Neue', Arial, sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 900px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            .admin-sidebar {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                padding: 16px 0;
+            }
+            .admin-menu {
+                flex-direction: row;
+                gap: 1rem;
+            }
+            .admin-main {
+                padding: 24px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="login-container" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff7e6;">
+        <form id="login-form" style="background:#fff;padding:32px 24px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.08);min-width:320px;">
+            <h2 style="color:#b71c1c;text-align:center;font-family:'Bebas Neue',Arial,sans-serif;">Acceso Administrador</h2>
+            <div style="margin-bottom:18px;">
+                <label for="password" style="font-size:1.1rem;">Contraseña:</label>
+                <input type="password" id="password" name="password" style="width:100%;padding:8px;margin-top:6px;border-radius:6px;border:1px solid #ffe0b2;">
+            </div>
+            <button type="submit" style="width:100%;background:#b71c1c;color:#fff;padding:10px 0;border:none;border-radius:8px;font-size:1.1rem;">Entrar</button>
+            <div id="login-error" style="color:#b71c1c;margin-top:12px;text-align:center;display:none;">Contraseña incorrecta</div>
+        </form>
+    </div>
+    <div class="admin-container" id="admin-panel" style="display:none;">
+        <aside class="admin-sidebar">
+            <h2>Admin</h2>
+            <nav class="admin-menu">
+                <a href="#">Pedidos</a>
+                <a href="#">Menú</a>
+                <a href="#">Estadísticas</a>
+            </nav>
+        </aside>
+        <main class="admin-main">
+            <button id="logout-btn" style="position:absolute;top:24px;right:32px;background:#b71c1c;color:#fff;padding:8px 18px;border:none;border-radius:8px;font-size:1rem;cursor:pointer;z-index:10;">Cerrar sesión</button>
+            <h1>Panel de Administración</h1>
+            <div id="admin-sections">
+                <section id="menu-section">
+                    <h2>Gestión de Platos del Menú</h2>
+                    <form id="add-plate-form" style="margin-bottom:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                        <div>
+                            <label>Nombre:<br><input type="text" id="plate-name" required></label>
+                        </div>
+                        <div>
+                            <label>Precio:<br><input type="number" id="plate-price" min="0" required></label>
+                        </div>
+                        <div>
+                            <label>Imagen:<br><input type="file" id="plate-img" accept="image/*" required></label>
+                        </div>
+                        <button type="submit" style="background:#b71c1c;color:#fff;padding:8px 18px;border:none;border-radius:8px;font-size:1rem;">Agregar Plato</button>
+                    </form>
+                    <table id="plates-table" style="width:100%;border-collapse:collapse;background:#fff;">
+                        <thead>
+                            <tr style="background:#ffe6e6;">
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </section>
+                <section id="orders-section" style="margin-top:48px;">
+                    <h2>Gestión de Pedidos</h2>
+                    <table id="orders-table" style="width:100%;border-collapse:collapse;background:#fff;">
+                        <thead>
+                            <tr style="background:#ffe6e6;">
+                                <th>Cliente</th>
+                                <th>Productos</th>
+                                <th>Total</th>
+                                <th>Método</th>
+                                <th>Comprobante</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+    const loginForm = document.getElementById('login-form');
+    const loginContainer = document.getElementById('login-container');
+    const adminPanel = document.getElementById('admin-panel');
+    const loginError = document.getElementById('login-error');
+
+    // Revisar si ya está autenticado en esta sesión
+    if (sessionStorage.getItem('adminAuth') === 'ok') {
+        loginContainer.style.display = 'none';
+        adminPanel.style.display = 'flex';
+    }
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const password = document.getElementById('password').value;
+        if(password === 'adminjuanvega') {
+            sessionStorage.setItem('adminAuth', 'ok');
+            loginContainer.style.display = 'none';
+            adminPanel.style.display = 'flex';
+        } else {
+            loginError.style.display = 'block';
+        }
+    });
+
+    // Botón cerrar sesión
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        sessionStorage.removeItem('adminAuth');
+        location.reload();
+    });
+
+    // --- Gestión de Platos del Menú ---
+    const PLATES_KEY = 'adminPlates';
+    function getPlates() {
+        return JSON.parse(localStorage.getItem(PLATES_KEY)) || [];
+    }
+    function savePlates(plates) {
+        localStorage.setItem(PLATES_KEY, JSON.stringify(plates));
+    }
+    function renderPlates() {
+        const plates = getPlates();
+        const tbody = document.querySelector('#plates-table tbody');
+        tbody.innerHTML = '';
+        plates.forEach((plate, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><img src="${plate.imagen}" alt="${plate.nombre}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;"></td>
+                <td>${plate.nombre}</td>
+                <td><input type="number" value="${plate.precio}" min="0" data-idx="${idx}" class="edit-price" style="width:80px;"></td>
+                <td><button data-idx="${idx}" class="delete-plate" style="background:#b71c1c;color:#fff;border:none;padding:6px 12px;border-radius:6px;">Eliminar</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    document.getElementById('add-plate-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const nombre = document.getElementById('plate-name').value.trim();
+        const precio = parseInt(document.getElementById('plate-price').value);
+        const imgInput = document.getElementById('plate-img');
+        const file = imgInput.files[0];
+        if(nombre && !isNaN(precio) && file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const imagen = evt.target.result;
+                const plates = getPlates();
+                plates.push({nombre, precio, imagen});
+                savePlates(plates);
+                renderPlates();
+                document.getElementById('add-plate-form').reset();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    document.querySelector('#plates-table tbody').addEventListener('click', function(e) {
+        if(e.target.classList.contains('delete-plate')) {
+            const idx = e.target.getAttribute('data-idx');
+            const plates = getPlates();
+            plates.splice(idx, 1);
+            savePlates(plates);
+            renderPlates();
+        }
+    });
+    document.querySelector('#plates-table tbody').addEventListener('change', function(e) {
+        if(e.target.classList.contains('edit-price')) {
+            const idx = e.target.getAttribute('data-idx');
+            const plates = getPlates();
+            const newPrice = parseInt(e.target.value);
+            if(!isNaN(newPrice)) {
+                plates[idx].precio = newPrice;
+                savePlates(plates);
+                renderPlates();
+            }
+        }
+    });
+    // Render inicial
+    renderPlates();
+
+    // --- Gestión de Pedidos ---
+    const ORDERS_KEY = 'adminOrders';
+    function getOrders() {
+        return JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+    }
+    function saveOrders(orders) {
+        localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+    }
+    function renderOrders() {
+        const orders = getOrders();
+        const tbody = document.querySelector('#orders-table tbody');
+        tbody.innerHTML = '';
+        orders.forEach((order, idx) => {
+            const productos = order.pedido.map(p => `${p.nombre} x${p.cantidad}`).join('<br>');
+            tbody.innerHTML += `
+                <tr>
+                    <td>${order.cliente || '-'}</td>
+                    <td>${productos}</td>
+                    <td>$${order.total ? order.total.toLocaleString() : '-'}</td>
+                    <td>${order.metodo ? (order.metodo === 'nequi' ? 'Nequi' : 'Efectivo') : '-'}</td>
+                    <td>${order.comprobante || '-'}</td>
+                    <td><button data-idx="${idx}" class="delete-order" style="background:#b71c1c;color:#fff;border:none;padding:6px 12px;border-radius:6px;">Eliminar</button></td>
+                </tr>
+            `;
+        });
+    }
+    document.querySelector('#orders-table tbody').addEventListener('click', function(e) {
+        if(e.target.classList.contains('delete-order')) {
+            const idx = e.target.getAttribute('data-idx');
+            const orders = getOrders();
+            orders.splice(idx, 1);
+            saveOrders(orders);
+            renderOrders();
+        }
+    });
+    // Render inicial de pedidos
+    renderOrders();
+    </script>
+</body>
+</html> 
